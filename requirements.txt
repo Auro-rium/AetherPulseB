@@ -1,0 +1,11 @@
+praw
+pymongo
+transformers
+torch
+python-dotenv
+redis
+fastapi
+uvicorn[standard]
+pydantic
+kafka-python
+aiokafka
