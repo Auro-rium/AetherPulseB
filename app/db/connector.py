@@ -1,24 +1,15 @@
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
+import os
 
-def get_mongo_collection(
-    mongo_uri: str,
-    db_name: str,
-    collection_name: str,
-    timeout_ms: int = 5000
-):
-    """
-    Connects to MongoDB and returns the specified collection.
-    Raises an exception if connection fails.
-    """
+def get_db():
+    mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+    db_name = os.getenv("DB_NAME", "reddit_stream")
     try:
-        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=timeout_ms)
-        # Force connection on a request as the connect=True parameter of MongoClient seems to be useless here
-        client.server_info()
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        client.server_info()  # Force connection
         db = client[db_name]
-        collection = db[collection_name]
-        print(f"Connected to MongoDB: {mongo_uri}, DB: {db_name}, Collection: {collection_name}")
-        return collection
+        return db
     except ConnectionFailure as e:
         print(f"Could not connect to MongoDB: {e}")
         raise

@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 import os
 from pathlib import Path
+from app.api.endpoints import user
 
 from app.api.endpoints import query, stream
 
@@ -28,6 +29,7 @@ app.add_middleware(
 # Include API routers
 app.include_router(query.router, prefix="/api/v1")
 app.include_router(stream.router, prefix="/api/v1")
+app.include_router(user.router, prefix="/api/v1")
 
 # Create static files directory if it doesn't exist
 static_dir = Path("static")
@@ -35,6 +37,8 @@ static_dir.mkdir(exist_ok=True)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root():

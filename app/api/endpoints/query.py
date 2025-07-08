@@ -10,6 +10,7 @@ from ..schemas import (
     RedditPost, RedditComment, RedditContent, SystemStats, 
     EmotionStats, IntentStats, SubredditStats, SearchQuery, APIResponse
 )
+from app.api.deps.auth import get_current_user
 
 # Load environment variables
 load_dotenv()
@@ -58,7 +59,7 @@ async def health_check():
         )
 
 @router.get("/stats", response_model=SystemStats)
-async def get_system_stats():
+async def get_system_stats(current_user=Depends(get_current_user)):
     """Get overall system statistics"""
     try:
         collection = get_mongodb_collection()
