@@ -167,6 +167,7 @@ def test_mongodb_connection():
         # Load environment variables
         load_dotenv()
         
+        # Use local MongoDB by default
         mongo_uri = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
         db_name = os.getenv('DB_NAME', 'reddit_stream')
         collection_name = os.getenv('COLLECTION_NAME', 'posts_comments')
@@ -175,8 +176,19 @@ def test_mongodb_connection():
         print(f"   DB: {db_name}")
         print(f"   Collection: {collection_name}")
         
-        # Test connection
-        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        # Test connection with proper SSL for Atlas
+        if mongo_uri.startswith("mongodb+srv://") or "mongodb.net" in mongo_uri:
+            import certifi
+            client = MongoClient(
+                mongo_uri, 
+                serverSelectionTimeoutMS=10000,
+                tls=True, 
+                tlsCAFile=certifi.where(),
+                tlsAllowInvalidCertificates=False,
+                tlsAllowInvalidHostnames=False
+            )
+        else:
+            client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
         client.server_info()  # This will test the connection
         
         # Test database access
@@ -190,7 +202,7 @@ def test_mongodb_connection():
         
     except Exception as e:
         print(f"❌ MongoDB connection failed: {e}")
-        print("   Make sure MongoDB is running")
+        print("   Make sure MongoDB is running locally: mongod")
         return False
 
 def test_redis_connection():

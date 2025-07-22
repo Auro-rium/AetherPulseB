@@ -10,12 +10,25 @@ from ..schemas import (
     RedditPost, RedditComment, RedditContent, SystemStats, 
     EmotionStats, IntentStats, SubredditStats, SearchQuery, APIResponse
 )
-from app.api.deps.auth import get_current_user
 
 # Load environment variables
 load_dotenv()
 
 router = APIRouter(prefix="/api/v1", tags=["query"])
+
+@router.get("/stats")
+async def get_stats():
+    # Return dummy data or real stats if you have them
+    return {
+        "total_posts": 0,
+        "total_comments": 0,
+        "subreddits_count": 0
+    }
+
+@router.get("/recent")
+async def get_recent(limit: int = 10):
+    # Return dummy data or real recent posts/comments if you have them
+    return []
 
 def get_mongodb_collection() -> Collection:
     """Get MongoDB collection for database operations"""
@@ -59,7 +72,7 @@ async def health_check():
         )
 
 @router.get("/stats", response_model=SystemStats)
-async def get_system_stats(current_user=Depends(get_current_user)):
+async def get_system_stats():
     """Get overall system statistics"""
     try:
         collection = get_mongodb_collection()

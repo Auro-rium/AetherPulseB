@@ -90,7 +90,7 @@ class SearchQuery(BaseModel):
     emotion: Optional[str] = Field(None, description="Filter by emotion")
     intent: Optional[str] = Field(None, description="Filter by intent")
     content_type: Optional[str] = Field(None, description="Filter by content type (post/comment)")
-    limit: int = Field(default=50, description="Number of results to return")
+    limit: int = Field(default=100, description="Number of results to return")
     skip: int = Field(default=0, description="Number of results to skip")
 
 class APIResponse(BaseModel):

@@ -1,11 +1,14 @@
 praw
-pymongo
+pymongo>=3.12.0
 transformers
 torch
 python-dotenv
-redis
+redis>=4.0.0
 fastapi
 uvicorn[standard]
 pydantic
-kafka-python
-aiokafka
+#kafka-python
+#aiokafka
+
+# Kafka (Redpanda compatible)
+confluent-kafka>=2.0.0

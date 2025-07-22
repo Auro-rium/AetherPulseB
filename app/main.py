@@ -7,6 +7,8 @@ from pathlib import Path
 from app.api.endpoints import user
 
 from app.api.endpoints import query, stream
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.openapi.docs import get_redoc_html
 
 # Create FastAPI app
 app = FastAPI(
@@ -244,6 +246,28 @@ async def root():
     </html>
     """
     return html_content
+
+# Custom Swagger UI route to force English
+@app.get("/docs", include_in_schema=False)
+def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Swagger UI",
+        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui-bundle.js",
+        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui.css",
+        swagger_ui_parameters={"locale": "en"}
+    )
+
+# Custom ReDoc UI route to force English
+@app.get("/redoc", include_in_schema=False)
+def custom_redoc_html():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - ReDoc",
+        redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
+        # Force English locale
+        redoc_options={"locale": "en"}
+    )
 
 @app.get("/health")
 async def health_check():

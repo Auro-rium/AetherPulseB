@@ -10,6 +10,7 @@ import time
 from dotenv import load_dotenv
 import praw
 from pymongo import MongoClient
+import certifi
 
 # Load environment variables
 load_dotenv()
@@ -42,7 +43,7 @@ def test_reddit_mongodb_pipeline():
     
     # Initialize MongoDB
     print("📦 Connecting to MongoDB...")
-    client = MongoClient(MONGO_URI)
+    client = MongoClient(MONGO_URI, tls=True, tlsCAFile=certifi.where())
     db = client[DB_NAME]
     collection = db[COLLECTION_NAME]
     

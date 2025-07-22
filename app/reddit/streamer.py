@@ -15,14 +15,14 @@ MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
 DB_NAME = os.getenv('DB_NAME', 'reddit_stream')
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'posts_comments')
 
-# Redis Configuration
-REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-REDIS_PORT = int(os.getenv('REDIS_PORT', '6379'))
-REDIS_DB = int(os.getenv('REDIS_DB', '0'))
+# Redis Configuration (from environment only)
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = int(os.getenv('REDIS_PORT')) if os.getenv('REDIS_PORT') else None
+REDIS_DB = int(os.getenv('REDIS_DB')) if os.getenv('REDIS_DB') else None
 REDIS_STREAMS = {
-    'posts': os.getenv('REDIS_POSTS_STREAM', 'reddit:posts'),
-    'comments': os.getenv('REDIS_COMMENTS_STREAM', 'reddit:comments'),
-    'processed': os.getenv('REDIS_PROCESSED_STREAM', 'reddit:processed')
+    'posts': os.getenv('REDIS_POSTS_STREAM'),
+    'comments': os.getenv('REDIS_COMMENTS_STREAM'),
+    'processed': os.getenv('REDIS_PROCESSED_STREAM')
 }
 
 TOP_SUBREDDITS = [
@@ -74,6 +74,8 @@ if __name__ == '__main__':
         print(f"\n🔄 CYCLE {cycle} - {time.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"{'='*60}")
         
+        # Set use_redis to True now that Redis is ready
+        use_redis = True
         try:
             process_and_store(
                 TOP_SUBREDDITS, 
@@ -81,11 +83,11 @@ if __name__ == '__main__':
                 MONGO_URI, 
                 DB_NAME, 
                 COLLECTION_NAME,
-                use_redis=False  # Temporarily disable Redis for testing
+                use_redis=use_redis
             )
         except Exception as e:
-            print(f"❌ Error in cycle {cycle}: {e}")
-            print("🔄 Retrying in 5 minutes...")
+            print(f"\u274c Error in cycle {cycle}: {e}")
+            print("\ud83d\udd04 Retrying in 5 minutes...")
         
         print(f"⏰ Sleeping for 5 minutes... (Next cycle: {cycle + 1})")
         cycle += 1

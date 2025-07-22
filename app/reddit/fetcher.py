@@ -4,11 +4,12 @@ from app.db.redis_connector import get_redis_manager
 
 def fetch_reddit_data(subreddits, reddit_client, post_limit=10, comment_limit=20, redis_manager=None):
     """
-    Fetch posts and comments from subreddits and stream to Redis.
+    Fetch posts and comments from subreddits and stream to Redis if redis_manager is provided.
     Returns generator for backward compatibility.
     """
+    # Only use redis_manager if not None
     if redis_manager is None:
-        redis_manager = get_redis_manager()
+        raise RuntimeError('Redis manager must be provided to stream data to Redis.')
     
     print(f"🔄 Fetching data from {len(subreddits)} subreddits...")
     
@@ -60,19 +61,19 @@ def fetch_reddit_data(subreddits, reddit_client, post_limit=10, comment_limit=20
 
 def fetch_from_redis(stream_type='posts', count=10, redis_manager=None):
     """
-    Fetch data from Redis streams.
+    Fetch data from Redis streams if redis_manager is provided.
     Useful for consumers that want to process from Redis.
     """
     if redis_manager is None:
-        redis_manager = get_redis_manager()
+        raise RuntimeError('Redis manager must be provided to fetch from Redis.')
     
     return redis_manager.read_from_stream(stream_type, count=count)
 
 def get_redis_stats(redis_manager=None):
     """
-    Get statistics about Redis streams.
+    Get statistics about Redis streams if redis_manager is provided.
     """
     if redis_manager is None:
-        redis_manager = get_redis_manager()
+        raise RuntimeError('Redis manager must be provided to get Redis stats.')
     
     return redis_manager.get_stream_info()

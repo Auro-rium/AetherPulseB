@@ -2,12 +2,23 @@ import redis
 import json
 import time
 from typing import Dict, List, Any, Optional
+import os
 
 class RedisStreamManager:
     """Manages Redis Streams for Reddit data pipeline"""
     
-    def __init__(self, host='localhost', port=6379, db=0, streams=None):
-        self.redis_client = redis.Redis(host=host, port=port, db=db, decode_responses=True)
+    def __init__(self, host=None, port=None, db=None, streams=None, username=None, password=None, url=None):
+        if url:
+            self.redis_client = redis.Redis.from_url(url, decode_responses=True)
+        else:
+            self.redis_client = redis.Redis(
+                host=host,
+                port=port,
+                db=db if db is not None else 0,
+                username=username,
+                password=password,
+                decode_responses=True
+            )
         self.streams = streams or {
             'posts': 'reddit:posts',
             'comments': 'reddit:comments',
@@ -106,6 +117,18 @@ class RedisStreamManager:
             return False
 
 # Convenience function
-def get_redis_manager(host='localhost', port=6379, db=0, streams=None):
-    """Get a Redis Stream Manager instance"""
-    return RedisStreamManager(host=host, port=port, db=db, streams=streams) 
+def get_redis_manager(host=None, port=None, db=None, streams=None, username=None, password=None, url=None):
+    """Get a Redis Stream Manager instance using environment variables if not provided"""
+    if url is None:
+        url = os.getenv('REDIS_URL')
+    if host is None:
+        host = os.getenv('REDIS_HOST')
+    if port is None:
+        port = int(os.getenv('REDIS_PORT')) if os.getenv('REDIS_PORT') else None
+    if db is None:
+        db = int(os.getenv('REDIS_DB')) if os.getenv('REDIS_DB') else 0
+    if username is None:
+        username = os.getenv('REDIS_USER')
+    if password is None:
+        password = os.getenv('REDIS_PASSWORD')
+    return RedisStreamManager(host=host, port=port, db=db, streams=streams, username=username, password=password, url=url) 
